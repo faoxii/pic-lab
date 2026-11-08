@@ -120,8 +120,8 @@ function Instruments() {
       {['ch1', 'ch2'].map(ch => (
         <div key={ch} className="chrow">
           <b style={{ color: ch === 'ch1' ? '#b89a00' : '#1a9fb0' }}>{ch.toUpperCase()}</b>
-          <select value={engine.bench.scopeSrc[ch]} onChange={e => { engine.bench.scopeSrc[ch] = e.target.value; refresh(); }}>
-            <option value="pin">fil : {pinTxt('bnc', ch)}</option>{active.includes('dac') && <option value="dac">Vout MCP4921</option>}</select>
+          <select value={engine.bench.scopeSrc[ch]} onChange={e => { engine.bench.scopeSrc[ch] = e.target.value; useStore.getState().syncWiring(); refresh(); }}>
+            <option value="pin">fil : {pinTxt('bnc', ch)}</option>{active.includes('dac') && <option value="dac">Vout MCP4921</option>}{active.includes('gbf') && <option value="gbf">GBF direct</option>}</select>
           <select value={S.vdiv[ch]} onChange={e => setS(s => s.vdiv[ch] = +e.target.value)}>{[0.5, 1, 2, 5].map(v => <option key={v} value={v}>{v} V/div</option>)}</select>
           <span className="mut small">position</span><button className="btn sm ghost" onClick={() => setS(s => s.pos[ch] -= 0.5)}>▼</button><button className="btn sm ghost" onClick={() => setS(s => s.pos[ch] += 0.5)}>▲</button>
         </div>))}

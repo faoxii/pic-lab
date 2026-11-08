@@ -79,12 +79,12 @@ MODS.dac = {
 export const MOD_ORDER = ['seg7', 'lcd', 'keypad', 'buttons', 'switches', 'pots', 'buzzer', 'dac', 'gbf', 'bnc'];
 const INSTR = ['gbf', 'bnc'];
 
-// emplacements autour de la carte PIC (connecteurs tournés vers le PIC)
+// emplacements autour de la carte PIC (toutes les cartes à l'endroit, texte lisible)
 const SLOTS = [
   { x: -8.6, z: 14.4, r: 0 }, { x: 8.6, z: 14.4, r: 0 },
-  { x: -22.5, z: 0, r: -Math.PI / 2 }, { x: 22.5, z: 0, r: Math.PI / 2 },
-  { x: -8.6, z: -14.8, r: Math.PI }, { x: 8.6, z: -14.8, r: Math.PI },
-  { x: -22.5, z: 13, r: -Math.PI / 2 }, { x: 22.5, z: 13, r: Math.PI / 2 },
+  { x: -22.5, z: 0, r: 0 }, { x: 22.5, z: 0, r: 0 },
+  { x: -8.6, z: -14.8, r: 0 }, { x: 8.6, z: -14.8, r: 0 },
+  { x: -22.5, z: 13, r: 0 }, { x: 22.5, z: 13, r: 0 },
 ];
 export function placements(active) {
   const res = {}; let i = 0;

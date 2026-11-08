@@ -71,7 +71,7 @@ export const useStore = create((set, get) => ({
     bench.rebuild();
     const wiring = JSON.parse(JSON.stringify(bench.wiring));
     set({ wiring, wv: get().wv + 1 });
-    ls.set('bench.' + get().lessonId, { wiring: bench.wiring, ribbons: get().ribbons, active: [...bench.active] });
+    ls.set('bench.' + get().lessonId, { wiring: bench.wiring, ribbons: get().ribbons, active: [...bench.active], scopeSrc: bench.scopeSrc });
     if (engine.sim) { engine.sim.pic.pinsChanged(); engine.sim.pic.inputsChanged(); }
   },
   // ----- câblage -----
@@ -79,9 +79,13 @@ export const useStore = create((set, get) => ({
     const ribbons = { ...get().ribbons };
     for (const [g, r] of Object.entries(MODS[mod].ribbons)) if (r.sigs.includes(sig) && ribbons[mod + '.' + g] !== undefined) { delete ribbons[mod + '.' + g]; r.sigs.forEach(s => bench.wiring[mod][s] = null); }
     bench.wiring[mod][sig] = pin;
+    if (mod === 'bnc' && bench.scopeSrc[sig] === 'gbf') bench.scopeSrc[sig] = 'pin';
     set({ ribbons }); get().syncWiring();
   },
   disconnect(mod, sig) { bench.wiring[mod][sig] = null; get().syncWiring(); },
+  // fil direct GBF → entrée de l'oscilloscope (sans passer par le PIC)
+  connectDirect(ch) { bench.wiring.bnc[ch] = null; bench.scopeSrc[ch] = 'gbf'; get().syncWiring(); },
+  disconnectDirect(ch) { if (bench.scopeSrc[ch] === 'gbf') bench.scopeSrc[ch] = 'pin'; get().syncWiring(); },
   connectRibbon(mod, group, port) {
     const r = MODS[mod].ribbons[group];
     r.sigs.forEach((s, i) => bench.wiring[mod][s] = port * 8 + i);
@@ -92,7 +96,7 @@ export const useStore = create((set, get) => ({
     const ribbons = { ...get().ribbons }; delete ribbons[mod + '.' + group];
     set({ ribbons }); get().syncWiring();
   },
-  unplugAll() { for (const m in bench.wiring) for (const s in bench.wiring[m]) bench.wiring[m][s] = null; set({ ribbons: {} }); get().syncWiring(); },
+  unplugAll() { for (const m in bench.wiring) for (const s in bench.wiring[m]) bench.wiring[m][s] = null; for (const c in bench.scopeSrc) if (bench.scopeSrc[c] === 'gbf') bench.scopeSrc[c] = 'pin'; set({ ribbons: {} }); get().syncWiring(); },
   autoWire() {
     const L = LESSONS.find(l => l.id === get().lessonId);
     get().unplugAll();
@@ -113,7 +117,7 @@ export const useStore = create((set, get) => ({
     let ribbons = {}, active = L.modules;
     if (saved) { try { for (const m in saved.wiring) for (const s in saved.wiring[m]) if (bench.wiring[m]) bench.wiring[m][s] = saved.wiring[m][s]; ribbons = saved.ribbons || {}; active = saved.active || L.modules; } catch (e) { } }
     bench.active = new Set(active);
-    bench.scopeSrc = { ch1: 'pin', ch2: 'pin', ...(L.scope || {}) };
+    bench.scopeSrc = { ch1: 'pin', ch2: 'pin', ...(L.scope || {}), ...((saved && saved.scopeSrc) || {}) };
     const code = keepCode ? get().code : get().savedCode(L);
     set({ lessonId: L.id, code, active, ribbons, pending: null, selected: null, errLine: 0, curLine: 0, warnLines: [], logs: [] });
     ls.set('lesson', L.id);

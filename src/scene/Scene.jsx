@@ -42,13 +42,13 @@ function CalloutSync() {
   });
   return null;
 }
-// déplacement au clavier : flèches, ZQSD ou WASD (A et D vont au clavier matriciel s'il est sur la table)
+// déplacement au clavier : flèches, ZQSD ou WASD 
 const panKeys = new Set();
 if (typeof window !== 'undefined') {
   const inEd = e => e.target.closest && (e.target.closest('.cm-editor') || ['INPUT', 'SELECT', 'TEXTAREA'].includes(e.target.tagName));
-  const map = e => { const k = e.key.length === 1 ? e.key.toLowerCase() : e.key; const kp = useStore.getState().active.includes('keypad');
+  const map = e => { const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
     if (k === 'ArrowUp' || k === 'z' || k === 'w') return 'f'; if (k === 'ArrowDown' || k === 's') return 'b';
-    if (k === 'ArrowLeft' || k === 'q' || (k === 'a' && !kp)) return 'l'; if (k === 'ArrowRight' || (k === 'd' && !kp)) return 'r'; return null; };
+    if (k === 'ArrowLeft' || k === 'q' || k === 'a') return 'l'; if (k === 'ArrowRight' || k === 'd') return 'r'; return null; };
   addEventListener('keydown', e => { if (inEd(e) || e.ctrlKey || e.metaKey) return; const d = map(e); if (d) { panKeys.add(d); if (e.key.startsWith('Arrow')) e.preventDefault(); } });
   addEventListener('keyup', e => { const d = map(e); if (d) panKeys.delete(d); });
   addEventListener('blur', () => panKeys.clear());

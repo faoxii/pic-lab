@@ -530,6 +530,7 @@ class Bench {
     }
   }
   scopeV(ch, C, pic) {
+    if (this.scopeSrc[ch] === 'gbf') return this.active.has('gbf') ? this.gbfV(C, pic.fcy) : 0;
     if (this.scopeSrc[ch] === 'dac') { const h = this.dac.hist; if (!h.length || C < h[0][0]) return 0; let lo = 0, hi = h.length - 1; while (lo < hi) { const mid = (lo + hi + 1) >> 1; if (h[mid][0] <= C) lo = mid; else hi = mid - 1; } return h[lo][1]; }
     const p = this.pin('bnc', ch); if (p === null) return null;
     if (p === 18 && pic.pwmActive() && !(pic.tris[2] >> 2 & 1)) { const w = pic.pwm(); return (C % w.T) < w.Th ? 5 : 0; }

@@ -34,6 +34,7 @@ export function pick(t) {
     if (t.type === 'mod') {
       const g = ribbonOf(t.mod, t.sig);
       if (g) { toast(`${t.label} est déjà relié par la nappe. Clique sur le connecteur blanc pour débrancher la nappe.`); return; }
+      if (t.mod === 'bnc' && engine.bench.scopeSrc[t.sig] === 'gbf') { st.disconnectDirect(t.sig); return start(T.mod('gbf', 'out')); }
       if (W[t.mod][t.sig] !== null) st.disconnect(t.mod, t.sig);
       return start(t);
     }
@@ -65,6 +66,10 @@ export function pick(t) {
     if (portWidth(p.port) < 8) { toast(`Le PORT${PORTS[p.port]} n'a que ${portWidth(p.port)} broches : choisis PORTB, PORTC ou PORTD.`); return; }
     st.connectRibbon(m.mod, m.group, p.port);
     useStore.setState({ pending: null }); return;
+  }
+  if (pair('mod', 'mod')) {
+    const g = [pend, t].find(x => x.mod === 'gbf'), b = [pend, t].find(x => x.mod === 'bnc');
+    if (g && b) { st.connectDirect(b.sig); useStore.setState({ pending: null }); toast(`GBF relié directement à ${b.sig.toUpperCase()} de l'oscilloscope.`); return; }
   }
   if (pend.type === t.type) return start(t);
   toast('Un fil relie une broche de module à une broche du PIC ; une nappe relie un connecteur blanc à un connecteur blanc.');

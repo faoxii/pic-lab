@@ -209,17 +209,14 @@ export default function App() {
   const [mview, setMview] = useState('scene');
   useEffect(() => {
     const st = useStore.getState(); st.loadLesson(st.lessonId);
-    const keyOf = k => { const lay = KEY_LAYOUTS.std; for (let r = 0; r < 4; r++) for (let c = 0; c < 4; c++) if (lay[r][c] === k) return r + ',' + c; return null; };
     const inEditor = e => e.target.closest && (e.target.closest('.cm-editor') || ['INPUT', 'SELECT', 'TEXTAREA'].includes(e.target.tagName));
     const down = e => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); useStore.getState().compileRun(); return; }
       if (e.key === 'Escape') { cancelPending(); useStore.setState({ codeExpanded: false }); }
       if (inEditor(e) || e.repeat) return;
-      const k = keyOf(e.key.toUpperCase()); if (k && useStore.getState().active.includes('keypad')) { engine.bench.keys.add(k); engine.sim?.pic.inputsChanged(); }
     };
-    const up = e => { const k = keyOf(e.key.toUpperCase()); if (k && engine.bench.keys.has(k)) { engine.bench.keys.delete(k); engine.sim?.pic.inputsChanged(); } };
-    addEventListener('keydown', down); addEventListener('keyup', up);
-    return () => { removeEventListener('keydown', down); removeEventListener('keyup', up); };
+    addEventListener('keydown', down);
+    return () => removeEventListener('keydown', down);
   }, []);
   return (
     <div className={'app m-' + mview + (expanded ? ' wide' : '')}>

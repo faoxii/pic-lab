@@ -90,5 +90,7 @@ export function Wires() {
       items.push(<Wire key={'w' + m + s + p} a={modPinWorld(m, s, active)} b={picPinWorld(p)} color={WIRE_COLORS[(ci++) % WIRE_COLORS.length]} label={`${SIG_LABEL(s)} → ${pinName(p)}`} onRemove={() => disconnect(m, s)} />);
     }
   }
+  if (active.includes('gbf') && active.includes('bnc')) for (const ch of ['ch1', 'ch2']) if (engine.bench.scopeSrc[ch] === 'gbf')
+    items.push(<Wire key={'gd' + ch} a={modPinWorld('gbf', 'out', active)} b={modPinWorld('bnc', ch, active)} color={ch === 'ch1' ? '#f2c230' : '#1fb5a8'} label={`GBF → ${ch.toUpperCase()}`} onRemove={() => useStore.getState().disconnectDirect(ch)} />);
   return <group>{items}<PendingWire /></group>;
 }

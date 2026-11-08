@@ -12,6 +12,7 @@ const LEVEL = 2.5; // niveau de déclenchement / seuil des mesures temporelles (
 function source(ch, pic) {
   const B = engine.bench;
   if (B.scopeSrc[ch] === 'dac') return { kind: 'hist', h: B.dac.hist };
+  if (B.scopeSrc[ch] === 'gbf') return B.active.has('gbf') ? { kind: 'gbf' } : null;
   const p = B.pin('bnc', ch);
   if (p === null) return null;
   if (p === 18 && pic.pwmActive() && !(pic.tris[2] >> 2 & 1)) return { kind: 'pwm' };
@@ -68,13 +69,16 @@ export function drawScope(cv, S, compact) {
   g.font = `600 ${fs}px "JetBrains Mono", monospace`;
   const sim = engine.sim, B = engine.bench;
   const cols = { ch1: '#f2d230', ch2: '#3fd6e8' };
-  if (!sim) { g.fillStyle = '#6fa892'; g.fillText('Pas de signal — lance un programme', 12, H / 2 - 10); scopeStats.ch1 = scopeStats.ch2 = null; return; }
-  const pic = sim.pic, span = S.tdiv * 10 * pic.fcy, now = pic.S.C;
+  // GBF branché directement sur l'oscillo : on affiche le signal même sans programme lancé
+  const direct = ch => B.scopeSrc[ch] === 'gbf' && B.active.has('gbf');
+  const pseudo = !sim && (direct('ch1') || direct('ch2'));
+  if (!sim && !pseudo) { g.fillStyle = '#6fa892'; g.fillText('Pas de signal — lance un programme', 12, H / 2 - 10); scopeStats.ch1 = scopeStats.ch2 = null; return; }
+  const pic = pseudo ? { fcy: 1e6, S: { C: performance.now() * 1e3 } } : sim.pic, span = S.tdiv * 10 * pic.fcy, now = pic.S.C;
   // déclenchement
   let t0, trig = false;
   if (!S.run && S.frozen != null) t0 = S.frozen;
   else {
-    const src = source(S.trigSrc, pic);
+    const src = pseudo && !direct(S.trigSrc) ? null : source(S.trigSrc, pic);
     const want = S.trigEdge === 'up' ? 1 : -1;
     const e = edgesBefore(src, now - span * 0.9, pic, 12).find(x => x[1] === want);
     if (e) { t0 = e[0] - span * 0.1; trig = true; } else t0 = now - span;
@@ -82,7 +86,7 @@ export function drawScope(cv, S, compact) {
   }
   const tEnd = Math.min(now, t0 + span);
   for (const ch of ['ch1', 'ch2']) {
-    const src = source(ch, pic);
+    const src = pseudo && !direct(ch) ? null : source(ch, pic);
     if (!src) { scopeStats[ch] = null; continue; }
     const base = H / 2 - S.pos[ch] * dy, vd = S.vdiv[ch];
     g.strokeStyle = cols[ch]; g.lineWidth = compact ? 2.5 : 2; g.beginPath();

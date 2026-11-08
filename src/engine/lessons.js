@@ -659,7 +659,7 @@ void init_adc(void)
     notes: [
       'On met UNE ligne à 1 (RA3, RA2, RA1 ou RA0) et on regarde quelle colonne (RE2, RE1, RE0) passe à 1.',
       'Ne pas oublier ADCON1 = 0x07 : RA et RE sont analogiques au reset et liraient toujours 0.',
-      'Clique (et maintiens) les touches, ou tape-les au clavier de l\'ordinateur.'
+      'Clique (et maintiens) les touches du clavier 3D.'
     ],
     defi: 'Affiche les 16 dernières touches à la suite sur la ligne 2.',
     code: HEAD('etape3.c', 'affiche sur le LCD la touche tapée au clavier', [...LCD_CAB, 'clavier : lignes RA3 RA2 RA1 RA0, colonnes RE2 RE1 RE0']) + TEMPO + LCD + CLAVIER + IT_VIDE + MAIN_TITLE + `void main(void)

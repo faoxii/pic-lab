@@ -34,24 +34,27 @@ const hdrMat = new THREE.MeshStandardMaterial({ color: '#141414', roughness: 0.6
 const holeGeo = new THREE.PlaneGeometry(0.18, 0.18);
 const holeMat = new THREE.MeshBasicMaterial({ color: '#000' });
 const hitGeo = new THREE.BoxGeometry(P * 0.95, 1.1, P * 0.95);
+// barrette triple (3 trous reliés = 3 fils possibles sur la même broche), comme sur la carte PIC
+const hdr3Geo = new THREE.BoxGeometry(P * 0.92, HDR_H, P * 2.92);
+const hit3Geo = new THREE.BoxGeometry(P * 0.95, 1.1, P * 2.95);
 const hitMat = new THREE.MeshBasicMaterial({ visible: false });
 const ringGeo = new THREE.RingGeometry(0.33, 0.43, 24);
 
 // Une broche de barrette femelle cliquable
-export function HeaderPin({ x, z, id, hint, onPick, glow }) {
+export function HeaderPin({ x, z, id, hint, onPick, glow, triple }) {
   const hovered = useStore(s => s.hover && s.hover.id === id);
   const pending = useStore(s => s.pending);
   const isFrom = pending && pending.id === id;
   return (
     <group position={[x, 0, z]}>
-      <mesh geometry={hdrGeo} material={hdrMat} position={[0, TOP + HDR_H / 2, 0]} />
-      <mesh geometry={holeGeo} material={holeMat} position={[0, TOP + HDR_H + 0.002, 0]} rotation-x={-Math.PI / 2} />
+      <mesh geometry={triple ? hdr3Geo : hdrGeo} material={hdrMat} position={[0, TOP + HDR_H / 2, 0]} />
+      {(triple ? [-P, 0, P] : [0]).map(dz => <mesh key={dz} geometry={holeGeo} material={holeMat} position={[0, TOP + HDR_H + 0.002, dz]} rotation-x={-Math.PI / 2} />)}
       {(hovered || isFrom || glow) && (
         <mesh geometry={ringGeo} position={[0, TOP + HDR_H + 0.02, 0]} rotation-x={-Math.PI / 2}>
           <meshBasicMaterial color={isFrom ? '#ffb020' : glow ? '#7fe0d0' : '#2fd4bd'} transparent opacity={glow && !hovered ? 0.55 : 1} />
         </mesh>
       )}
-      <mesh geometry={hitGeo} material={hitMat} position={[0, TOP + 0.45, 0]}
+      <mesh geometry={triple ? hit3Geo : hitGeo} material={hitMat} position={[0, TOP + 0.45, 0]}
         onPointerOver={e => { e.stopPropagation(); useStore.setState({ hover: { id, text: hint(), x: e.nativeEvent.clientX, y: e.nativeEvent.clientY } }); document.body.style.cursor = 'pointer'; }}
         onPointerMove={e => { const h = useStore.getState().hover; if (h && h.id === id) useStore.setState({ hover: { ...h, x: e.nativeEvent.clientX, y: e.nativeEvent.clientY } }); }}
         onPointerOut={() => { if (useStore.getState().hover?.id === id) useStore.setState({ hover: null }); document.body.style.cursor = ''; }}
