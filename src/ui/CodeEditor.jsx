@@ -15,7 +15,7 @@ const marks = StateField.define({
 });
 const theme = EditorView.theme({
   '&': { backgroundColor: '#1c1b19', color: '#e8e2d4', height: '100%', fontSize: '12.5px' },
-  '.cm-content': { fontFamily: '"JetBrains Mono", ui-monospace, Menlo, monospace', caretColor: '#fff' },
+    '.cm-content': { fontFamily: '"JetBrains Mono", ui-monospace, Menlo, monospace', caretColor: '#fff', fontVariantLigatures: 'none', fontFeatureSettings: '"liga" 0, "calt" 0' },
   '.cm-gutters': { backgroundColor: '#181715', color: '#6f6a5f', border: 'none' },
   '.cm-activeLine': { backgroundColor: 'rgba(255,255,255,.035)' }, '.cm-activeLineGutter': { backgroundColor: 'rgba(255,255,255,.05)' },
   '&.cm-focused .cm-selectionBackground, .cm-selectionBackground, ::selection': { backgroundColor: 'rgba(127,209,196,.3) !important' },
