@@ -34,7 +34,7 @@ export const MODS = {
   },
   lcd: {
     title: 'Module LCD 16×2', w: 13.5, d: 8.6,
-    pins: { ...row(['d0', 'd1', 'd2', 'd3', 'd4', 'd5', 'd6', 'd7'], -5.9, -2.5), ...row(['rs', 'rw', 'e'], 2.4, -3.6, 0.95) },
+    pins: { ...row(['d7', 'd6', 'd5', 'd4', 'd3', 'd2', 'd1', 'd0'], -5.9, -2.5), ...row(['e', 'rw', 'rs'], 2.4, -3.6, 0.95) },
     ribbons: { data: { sigs: ['d0', 'd1', 'd2', 'd3', 'd4', 'd5', 'd6', 'd7'], x: -3.8, z: -3.7, label: 'données D0→D7' } },
     desc: 'Afficheur HD44780 16 caractères × 2 lignes. RS : 0 = commande, 1 = caractère. RW : 0 = écriture. E : la donnée est lue sur le front descendant. Mode 8 bits (D0…D7) ou 4 bits (D4…D7 seulement).',
   },
@@ -104,7 +104,7 @@ export function toWorld(slot, [x, z]) {
   const c = Math.cos(slot.r), s = Math.sin(slot.r);
   return [slot.x + x * c + z * s, slot.z - x * s + z * c];
 }
-export const SIG_LABEL = s => s.startsWith('dis') ? 'Dis' + s[3] : s.startsWith('pot') ? 'POT' + s[3] : s.startsWith('bp') ? 'BP' + s[2] : (s[0] === 'r' && s.length === 2) ? 'L' + s[1] : s.toUpperCase();
+export const SIG_LABEL = s => s.startsWith('dis') ? 'Dis' + s[3] : s.startsWith('pot') ? 'POT' + s[3] : s.startsWith('bp') ? 'BP' + s[2] : /^r\d$/.test(s) ? 'L' + s[1] : s.toUpperCase();
 export const WIRE_COLORS = ['#e2552e', '#2a6fdb', '#f2c230', '#21a35b', '#8e44ad', '#ef7d1a', '#1fb5a8', '#d6336c', '#555'];
 export const RIBBON_COLORS = ['#7a4a2a', '#d23a2a', '#f08a24', '#f2d230', '#2e9e4f', '#2a6fdb', '#7d4bb5', '#8a8a8a'];
 
